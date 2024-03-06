@@ -2,11 +2,13 @@ const express = require("express");
 const { default: mongoose } = require("mongoose");
 const dotenv = require("dotenv");
 const auth = require("./routes/auth");
+const cookieParser = require("cookie-parser");
+const { requireAuth, checkUser } = require("./middleware/authMiddleware");
 
 const app = express();
 dotenv.config();
 app.use(express.json());
-app.use(auth);
+app.use(cookieParser());
 const PORT = process.env.PORT || 4000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -21,3 +23,6 @@ mongoose
   .catch((err) => {
     console.error("error connecting to mongoDb:", err.message);
   });
+
+app.get("*", checkUser);
+app.use(auth);
